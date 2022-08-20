@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:5.0.7-alpine
+    container_name: go-matcha-redis
+    ports:
+      - "6379:6379"
+  api:
+    build:
+      context: ./api
+    command: reflex -r '\.go$$' -s -- sh -c 'go run ./cmd/main.go'
+    container_name: go-matcha-api
+    ports:
+      - "1992:8080"
+    volumes:
+      - ./api:/app
+    working_dir: /app
+    depends_on:
+      - redis
+    tty: true
