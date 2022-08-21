@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <title>sample</title>
+    <script type="text/javascript">
+      // script(↑に記載してるもの)
+      var socket = null;
+
+      // サーバーに接続する (一連の処理)
+      window.onload = function () {
+        socket = new WebSocket("ws://localhost:1992/ws?userId=hoge");
+        socket.onopen = function () {
+          append_message("system", "connect to server");
+        };
+        socket.onmessage = function (event) {
+          // サーバーからメッセージを受け取る
+          append_message("server", event.data);
+        };
+      };
+
+      // メッセージ欄を更新する
+      function append_message(name, message) {
+        let li_name = document.createElement("li");
+        let name_txt = document.createTextNode(name);
+        li_name.appendChild(name_txt);
+
+        let ul_message = document.createElement("ul");
+
+        let li_message = document.createElement("li");
+        let message_txt = document.createTextNode(message);
+        li_message.appendChild(message_txt);
+
+        ul_message.appendChild(li_message);
+
+        li_name.appendChild(ul_message);
+
+        let ul = document.getElementById("messages");
+        ul.appendChild(li_name);
+      }
+
+      // サーバーにメッセージを送信する
+      function send() {
+        let send_msg = document.getElementById("message");
+        let msg = send_msg.value;
+        if (msg == "") {
+          return;
+        }
+        socket.send(msg);
+        append_message("you", msg);
+        send_msg.value = "";
+      }
+    </script>
+</head>
+<body>
+<!-- 送信欄 -->
+<p>メッセージを入力してください。</p>
+<input type="text" id="message" /><button onclick="send()">送信</button>
+
+<!-- メッセージ欄 -->
+<p>メッセージ一覧</p>
+<ul id="messages"></ul>
+</body>
+</html>
