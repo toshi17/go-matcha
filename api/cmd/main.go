@@ -16,14 +16,16 @@ var wsupgrader = websocket.Upgrader{
 	},
 }
 
-func wshandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := wsupgrader.Upgrade(w, r, nil)
+func wshandler(c *gin.Context) {
+	conn, err := wsupgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("Failed to set websocket upgrade: %+v", err)
 		return
 	}
 	defer conn.CloseHandler()
 	for {
+		userId := c.Query("userId")
+		log.Println("userID:" + userId)
 		mt, message, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println(err)
@@ -48,8 +50,6 @@ func main() {
 			"message": "pong",
 		})
 	})
-	r.GET("/ws", func(c *gin.Context) {
-		wshandler(c.Writer, c.Request)
-	})
+	r.GET("/ws", wshandler)
 	r.Run()
 }
