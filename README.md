@@ -1,2 +1,2 @@
 # go-matcha
-match making
+real-time match making system with redis
